@@ -5,16 +5,29 @@ from pathlib import Path
 import sys
 
 # Supported file formats
-SUPPORTED_FORMATS = ['.mp4', '.mkv', '.avi', '.mov', '.mp3', '.wav', '.m4a', '.flac', '.webm']
-VALID_MODELS = ['tiny', 'base', 'small', 'medium', 'large']
+SUPPORTED_FORMATS = [
+    ".mp4",
+    ".mkv",
+    ".avi",
+    ".mov",
+    ".mp3",
+    ".wav",
+    ".m4a",
+    ".flac",
+    ".webm",
+]
+VALID_MODELS = ["tiny", "base", "small", "medium", "large"]
+
 
 def print_banner():
-    """Print a friendly welcome banner"""
+    """Welcome banner"""
     print("=" * 60)
     print("  VIDEO/AUDIO TRANSCRIPTION TOOL")
     print("  Powered by OpenAI Whisper")
+    print(" please refer to usage instructions in readme")
     print("=" * 60)
     print()
+
 
 def validate_file(file_path):
     """
@@ -31,11 +44,15 @@ def validate_file(file_path):
 
     file_ext = Path(file_path).suffix.lower()
     if file_ext not in SUPPORTED_FORMATS:
-        return False, f"Unsupported file format: '{file_ext}'\nSupported formats: {', '.join(SUPPORTED_FORMATS)}"
+        return (
+            False,
+            f"Unsupported file format: '{file_ext}'\nSupported formats: {', '.join(SUPPORTED_FORMATS)}",
+        )
 
     return True, None
 
-def transcribe_video(video_path, model_size="base", output_path=None, language=None):
+
+def transcribe_video(video_path, model_size="base", output_path=None, language="en"):
     """
     Transcribe a video/audio file using OpenAI Whisper
 
@@ -43,7 +60,7 @@ def transcribe_video(video_path, model_size="base", output_path=None, language=N
         video_path: Path to the video/audio file
         model_size: Whisper model size (tiny, base, small, medium, large)
         output_path: Custom output path (optional)
-        language: Language code (optional, auto-detect if None)
+        language: Language code (default: "en" for English)
     """
     # Validate file
     is_valid, error_msg = validate_file(video_path)
@@ -67,10 +84,8 @@ def transcribe_video(video_path, model_size="base", output_path=None, language=N
         print("   (This may take several minutes depending on file length)")
         print()
 
-        # Transcribe with or without language specification
-        transcribe_options = {"verbose": True}
-        if language:
-            transcribe_options["language"] = language
+        # Transcribe with language specification
+        transcribe_options = {"verbose": True, "language": language}
 
         result = model.transcribe(video_path, **transcribe_options)
 
@@ -104,9 +119,10 @@ def transcribe_video(video_path, model_size="base", output_path=None, language=N
         print("   Please check that the file is not corrupted and try again.")
         return None
 
+
 def main():
     parser = argparse.ArgumentParser(
-        description='Transcribe video/audio files using OpenAI Whisper',
+        description="Transcribe video/audio files using OpenAI Whisper",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=f"""
 Examples:
@@ -123,27 +139,35 @@ Models (tiny → large = faster → more accurate):
   - small:  Better accuracy
   - medium: High accuracy
   - large:  Best accuracy, slowest
-        """
+        """,
     )
 
-    parser.add_argument('file',
-                       help='Path to video/audio file to transcribe')
+    parser.add_argument("file", help="Path to video/audio file to transcribe")
 
-    parser.add_argument('-m', '--model',
-                       choices=VALID_MODELS,
-                       default='base',
-                       help='Whisper model size (default: base)')
+    parser.add_argument(
+        "-m",
+        "--model",
+        choices=VALID_MODELS,
+        default="base",
+        help="Whisper model size (default: base)",
+    )
 
-    parser.add_argument('-o', '--output',
-                       help='Output file path (default: <input>_transcript.txt)')
+    parser.add_argument(
+        "-o", "--output", help="Output file path (default: <input>_transcript.txt)"
+    )
 
-    parser.add_argument('-l', '--language',
-                       help='Language code (e.g., en, es, fr). Auto-detect if not specified')
+    parser.add_argument(
+        "-l",
+        "--language",
+        default="en",
+        help="Language code (default: en). Examples: en, es, fr, de",
+    )
 
     args = parser.parse_args()
 
     print_banner()
     transcribe_video(args.file, args.model, args.output, args.language)
+
 
 if __name__ == "__main__":
     main()

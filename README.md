@@ -39,66 +39,176 @@ A user-friendly Python tool to transcribe video and audio files using OpenAI's W
 
    Note: This will also install PyTorch and other required dependencies.
 
-## Usage
+## Quick Start
+
+**Simplest usage:**
+```bash
+python transcribe.py your-video.mp4
+```
+
+This will:
+1. Load the base model (good balance of speed and accuracy)
+2. Transcribe in English (default language)
+3. Save to `your-video_transcript.txt` in the same directory
+4. Show a preview of the transcript when complete
+
+## Usage Guide
+
+### Command Structure
+
+```bash
+python transcribe.py <file> [OPTIONS]
+```
+
+**Required:**
+- `<file>` - Path to your video or audio file
+
+**Optional flags:**
+- `-m, --model` - Choose model size (tiny/base/small/medium/large)
+- `-o, --output` - Specify custom output file path
+- `-l, --language` - Set language code (default: en)
+- `--help` - Show help message with all options
 
 ### Get Help
 
-View all available options:
+View all available options and examples:
 ```bash
 python transcribe.py --help
 ```
 
-### Basic Usage
+### Step-by-Step Examples
 
-Transcribe a file with default settings (base model, auto-detect language):
+#### 1. Basic Transcription (Recommended for Most Users)
+
 ```bash
-python transcribe.py video.mp4
+python transcribe.py "meeting-recording.mp4"
 ```
 
-### Choose a Different Model
+**What happens:**
+- ⏳ Downloads/loads the `base` model (once, ~140MB)
+- 🎙️ Transcribes audio in English
+- 💾 Saves to `meeting-recording_transcript.txt`
+- 📝 Shows preview of first 500 characters
 
-Use `-m` or `--model` to specify model size:
+**Expected time:** ~1-2 minutes per hour of audio (CPU), faster with GPU
+
+#### 2. High Accuracy Transcription
+
+For important content where accuracy matters (interviews, lectures, legal recordings):
+
 ```bash
-python transcribe.py video.mp4 -m large
+python transcribe.py "interview.mp4" -m large
 ```
 
-Available models (from fastest to most accurate):
-- `tiny` - Fastest, lowest accuracy
-- `base` - Good balance (default)
-- `small` - Better accuracy
-- `medium` - High accuracy
-- `large` - Best accuracy, slowest
+**What changes:**
+- Uses `large` model (~2.9GB, downloaded once)
+- Much more accurate but slower
+- Best for professional use
 
-### Specify Output File
+**Expected time:** ~5-10 minutes per hour of audio (CPU)
 
-Use `-o` or `--output` to set a custom output path:
+#### 3. Quick Draft Transcription
+
+For long videos where you need a quick rough transcript:
+
 ```bash
-python transcribe.py audio.mp3 -o my_transcript.txt
+python transcribe.py "3-hour-lecture.mp4" -m tiny
 ```
 
-### Specify Language
+**What changes:**
+- Uses `tiny` model (~39MB)
+- Fastest processing
+- Lower accuracy, may have more errors
 
-Use `-l` or `--language` to set the language (auto-detect if not specified):
+**Expected time:** ~30 seconds per hour of audio (CPU)
+
+#### 4. Non-English Content
+
+For Spanish, French, German, or other languages:
+
 ```bash
-python transcribe.py video.mkv -l es  # Spanish
-python transcribe.py video.mkv -l fr  # French
-python transcribe.py video.mkv -l de  # German
+python transcribe.py "spanish-podcast.mp3" -l es
+python transcribe.py "french-video.mp4" -l fr
+python transcribe.py "german-interview.mkv" -l de
 ```
 
-### Complete Examples
+**Common language codes:**
+- `en` - English (default)
+- `es` - Spanish
+- `fr` - French
+- `de` - German
+- `it` - Italian
+- `pt` - Portuguese
+- `ru` - Russian
+- `ja` - Japanese
+- `zh` - Chinese
+- `ar` - Arabic
+
+[See full list of supported languages](https://github.com/openai/whisper#available-models-and-languages)
+
+#### 5. Custom Output Location
+
+Save transcript to a specific location:
 
 ```bash
-# Basic transcription with default settings
-python transcribe.py "my-recording.mp4"
+python transcribe.py "video.mp4" -o "C:/Documents/transcripts/my-transcript.txt"
+```
 
-# High accuracy transcription
-python transcribe.py "interview.mkv" -m large
+Or organize by date:
 
-# Spanish audio with custom output
-python transcribe.py "podcast.mp3" -m medium -l es -o "podcast_transcript.txt"
+```bash
+python transcribe.py "meeting.mp4" -o "transcripts/2025-10-06-meeting.txt"
+```
 
-# Quick transcription of long video
-python transcribe.py "long-video.mp4" -m tiny
+#### 6. Combined Options
+
+For maximum accuracy Spanish podcast with custom output:
+
+```bash
+python transcribe.py "podcast-ep1.mp3" -m large -l es -o "transcripts/episode-1.txt"
+```
+
+### Model Comparison
+
+| Model | Size | Speed | Accuracy | Best For |
+|-------|------|-------|----------|----------|
+| `tiny` | 39 MB | ⚡⚡⚡⚡⚡ | ⭐⭐ | Quick drafts, testing |
+| `base` | 140 MB | ⚡⚡⚡⚡ | ⭐⭐⭐ | **Default - balanced** |
+| `small` | 460 MB | ⚡⚡⚡ | ⭐⭐⭐⭐ | Better accuracy |
+| `medium` | 1.5 GB | ⚡⚡ | ⭐⭐⭐⭐⭐ | Professional work |
+| `large` | 2.9 GB | ⚡ | ⭐⭐⭐⭐⭐⭐ | Maximum accuracy |
+
+**Note:** First run downloads the model. Subsequent runs are faster.
+
+### What You'll See While Running
+
+```
+============================================================
+  VIDEO/AUDIO TRANSCRIPTION TOOL
+  Powered by OpenAI Whisper
+============================================================
+
+📁 File: your-video.mp4
+📊 Size: 245.67 MB
+
+⏳ Loading Whisper model 'base'...
+   (This may take a moment on first run)
+✓ Model loaded successfully!
+
+🎙️  Transcribing audio...
+   (This may take several minutes depending on file length)
+
+[Whisper progress output appears here]
+
+============================================================
+✅ SUCCESS! Transcript saved to:
+   your-video_transcript.txt
+============================================================
+
+📝 Preview:
+------------------------------------------------------------
+[First 500 characters of your transcript...]
+------------------------------------------------------------
 ```
 
 ## Output
